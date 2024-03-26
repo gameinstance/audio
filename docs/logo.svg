@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="29mm"
+   viewBox="0 0 147 20.3"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="logo.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.40567375"
+     inkscape:cx="-277.31644"
+     inkscape:cy="194.73777"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     units="mm"
+     width="106mm"
+     scale-x="0.7" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       id="rect94"
+       width="144.23781"
+       height="16.61216"
+       x="1.470994"
+       y="2.1329658"
+       style="fill:#333333;stroke-width:0.191001" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#e6e6e6;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="5.5931101"
+       y="13.839421"
+       id="text1000"><tspan
+         sodipodi:role="line"
+         id="tspan998"
+         style="fill:#e6e6e6;stroke-width:0.264583"
+         x="5.5931101"
+         y="13.839421">GameInstance</tspan></text>
+    <rect
+       style="fill:#ab37c8;stroke-width:0.242234"
+       id="rect7290"
+       width="62.371319"
+       height="16.611479"
+       x="83.58007"
+       y="-1.1507612"
+       transform="matrix(0.99958992,0.02863551,-0.02540026,0.99967736,0,0)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#f2f2f2;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="99.307892"
+       y="3.5290771"
+       id="text7558"
+       transform="rotate(5.37974)"><tspan
+         sodipodi:role="line"
+         style="fill:#f2f2f2;stroke-width:0.264583"
+         x="99.307892"
+         y="3.5290771"
+         id="tspan1026">audio</tspan></text>
+  </g>
+</svg>
