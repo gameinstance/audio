@@ -363,7 +363,7 @@ inline void decoder<INPUT_STREAM, BUFFER_SIZE>::_decode_subframe_lpc(uint8_t ord
 
 	auto precision = (uint8_t)_istream.get_uint(4) + 1;
 	auto shift =      (int8_t)_istream.get_int(5);
-	for (int i = 0; i < order; i++)
+	for (int i = 0; i < order; ++i)
 		_coefficients[i] = _istream.get_int(precision);
 
 	_decode_residuals(order);
