@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 
 void print_info(const audio::flac::streaminfo_type &info)
 {
-	printf("flac stream info:\n");
+	printf("FLAC stream info:\n");
 	printf("* min_block_size=%u\n", info.min_block_size);
 	printf("* max_block_size=%u\n", info.max_block_size);
 	printf("* min_frame_size=%u\n", info.min_frame_size);
