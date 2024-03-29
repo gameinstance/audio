@@ -140,7 +140,7 @@ void encoder<OUTPUT_STREAM>::encode_sample(int32_t sample)
 			_put_int32(sample);
 			break;
 		default:
-			throw basics::error{"wave::encoder: (protocol error) unexpected sample bit size (%zu)",
+			throw basics::error{"audio::wave::encoder: (protocol error) unexpected sample size (%zub)",
 																		_streaminfo.sample_bit_size};
 	}
 }
