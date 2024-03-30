@@ -112,6 +112,12 @@ private:
 /******************************************************************************************************/
 
 
+/*
+ * Limitations: * decodes only stereo streams
+ *              * decoder doesn't attempt to resync, thus cannot seek
+ */
+
+
 static constexpr const char *_decoder_name = "audio::flac::decoder";
 static constexpr int16_t _fixed_prediction_coefficients[5][4] = {
 	{},
@@ -188,6 +194,11 @@ void decoder<INPUT_STREAM, BUFFER_SIZE>::decode_audio()
 		return;
 	}
 
+	if (_streaminfo.channel_count > max_channel_count)
+		throw basics::error{"%s: (assertion failed) cannot decode more than %u channels; got %u",
+														max_channel_count, _streaminfo.channel_count};
+
+
 	// FRAME_HEADER
 	const auto sync_code = _istream.get_uint(14);
 	if (sync_code != 0b11111111111110)
@@ -216,13 +227,17 @@ void decoder<INPUT_STREAM, BUFFER_SIZE>::decode_audio()
 	_istream.get_uint(8);  // CRC-8 polynomial
 
 	// SUBFRAME+
-	if (channel_assignment_bitset < 8) {
+	if (channel_assignment_bitset < 8) {  // independent channel encoding
 		for (_channel_idx = 0; _channel_idx < _streaminfo.channel_count; ++_channel_idx) {
 			_buffer[_channel_idx].resize(_block_size);
 
 			_decode_subframe(sample_bit_size);
 		}
-	} else if (channel_assignment_bitset < 11) {
+	} else if (channel_assignment_bitset < 11) {  // correlated channel encoding
+		// if (_streaminfo.channel_count != 2)
+		// 	throw basics::error{"%s: (protocol error) correlated channel encoding for non-stereo;"
+		// 							"expecting 2, got %u channels", _streaminfo.channel_count};
+
 		_channel_idx = 0;
 		_buffer[_channel_idx].resize(_block_size);
 		_decode_subframe(sample_bit_size + ((channel_assignment_bitset == 9) ? 1 : 0));
@@ -231,20 +246,22 @@ void decoder<INPUT_STREAM, BUFFER_SIZE>::decode_audio()
 		_buffer[_channel_idx].resize(_block_size);
 		_decode_subframe(sample_bit_size + ((channel_assignment_bitset == 9) ? 0 : 1));
 
-		if (channel_assignment_bitset == 8) {
+		// side=left-right; mid=left+right;
+		if (channel_assignment_bitset == 8) {          // left-side:  ch0=left, ch1=side
 			for (uint16_t i = 0; i < _block_size; ++i)
 				_buffer[1][i] = _buffer[0][i] - _buffer[1][i];
-		} else if (channel_assignment_bitset == 9) {
+		} else if (channel_assignment_bitset == 9) {   // right-side: ch0=side, ch1=right
 			for (uint16_t i = 0; i < _block_size; ++i)
 				_buffer[0][i] += _buffer[1][i];
-		} else if (channel_assignment_bitset == 10) {
-			buffer_sample_type side{};
-			buffer_sample_type right{};
+		} else if (channel_assignment_bitset == 10) {  // mid-side:   ch0=mid,  ch1=side
+			buffer_sample_type mid{};
+			// buffer_sample_type side{};
 			for (uint16_t i = 0; i < _block_size; ++i) {
-				side = _buffer[1][i];
-				right = (buffer_sample_type)_buffer[0][i] - (side >> 1);
-				_buffer[1][i] = right;
-				_buffer[0][i] = right + side;
+				mid = (uint64_t)_buffer[0][i] << 1;
+				// side = _buffer[1][i];
+				mid |= _buffer[1][i] & 1;  // odd side
+				_buffer[0][i] = (mid + _buffer[1][i]) >> 1;
+				_buffer[1][i] = (mid - _buffer[1][i]) >> 1;
 			}
 		}
 	} else
