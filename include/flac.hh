@@ -244,7 +244,7 @@ void decoder<INPUT_STREAM, BUFFER_SIZE>::decode_audio()
 				side = _buffer[1][i];
 				right = (buffer_sample_type)_buffer[0][i] - (side >> 1);
 				_buffer[1][i] = right;
-				_buffer[0][i] = (int16_t)(right + side);
+				_buffer[0][i] = right + side;
 			}
 		}
 	} else
