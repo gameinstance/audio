@@ -165,10 +165,10 @@ void decoder<INPUT_STREAM, BUFFER_SIZE>::decode_metadata()
 
 		if (_streaminfo.channel_count > max_channel_count)
 			throw basics::error{"%s: (assertion failed) expecting maximum %zu channels; got %u",
-												_decoder_name, max_channel_count, _streaminfo.channel_count};
+										_decoder_name, max_channel_count, _streaminfo.channel_count};
 		if (_streaminfo.max_block_size > BUFFER_SIZE)
 			throw basics::error{"%s: (assertion failed) expecting maximum %zu samples/block; got %u",
-												_decoder_name, BUFFER_SIZE, _streaminfo.max_block_size};
+											_decoder_name, BUFFER_SIZE, _streaminfo.max_block_size};
 
 		for (auto i = uint8_t{0}; i < 16; ++i)
 			_istream.get_byte();
@@ -192,7 +192,7 @@ void decoder<INPUT_STREAM, BUFFER_SIZE>::decode_audio()
 	const auto sync_code = _istream.get_uint(14);
 	if (sync_code != 0b11111111111110)
 		throw basics::error{"%s: (protocol error) unexpected frame sync code; got 0x%x, expecting 0x%x",
-																	_decoder_name, sync_code, 0b11111111111110};
+															_decoder_name, sync_code, 0b11111111111110};
 
 	if (_istream.get_uint(1) != 0)
 		throw basics::error{"%s: (protocol error) unexpected frame reserved bit #1", _decoder_name};
@@ -249,7 +249,7 @@ void decoder<INPUT_STREAM, BUFFER_SIZE>::decode_audio()
 		}
 	} else
 		throw basics::error{"%s: (assertion failed) unsupported channel assignment (%u)",
-																	_decoder_name, channel_assignment_bitset};
+															_decoder_name, channel_assignment_bitset};
 
 	_sample_count += _block_size;
 	++_frame_count;
@@ -322,11 +322,13 @@ inline void decoder<INPUT_STREAM, BUFFER_SIZE>::_decode_subframe(uint8_t sample_
 		for (uint16_t i = 0; i < _buffer[_channel_idx].size(); ++i)
 			_buffer[_channel_idx][i] = _istream.get_int(sample_bit_size);
 	} else if (subframe_type < 8) {
-		throw basics::error{"%s: (protocol error) reserved subframe type 1(%u)", _decoder_name, subframe_type};
+		throw basics::error{"%s: (protocol error) reserved subframe type 1(%u)",
+																		_decoder_name, subframe_type};
 	} else if (subframe_type < 13) {  // SUBFRAME_FIXED
 		_decode_subframe_fixed(subframe_type - 8, sample_bit_size);
 	} else if (subframe_type < 32) {
-		throw basics::error{"%s: (protocol error) reserved subframe type 2(%u)", _decoder_name, subframe_type};
+		throw basics::error{"%s: (protocol error) reserved subframe type 2(%u)",
+																		_decoder_name, subframe_type};
 	} else {  // SUBFRAME_LPC
 		_decode_subframe_lpc(subframe_type - 31, sample_bit_size);
 	}
@@ -372,7 +374,7 @@ inline void decoder<INPUT_STREAM, BUFFER_SIZE>::_decode_residuals(uint8_t order)
 	auto coding_method = (uint8_t)_istream.get_uint(2);
 	if (coding_method > 1)
 		throw basics::error{"%s: (protocol error) reserved residual coding method (%u)",
-																				_decoder_name, coding_method};
+																		_decoder_name, coding_method};
 
 	auto partition_order = (uint8_t)_istream.get_uint(4);
 	auto partition_count = (uint16_t)1 << partition_order;
@@ -382,7 +384,7 @@ inline void decoder<INPUT_STREAM, BUFFER_SIZE>::_decode_residuals(uint8_t order)
 
 	if (_buffer[_channel_idx].size() % partition_count != 0)
 		throw basics::error{"%s: (protocol error) invalid partition count vs. block size "
-							"(%u %% %u != 0)", _decoder_name, _buffer[_channel_idx].size(), partition_count};
+					"(%u %% %u != 0)", _decoder_name, _buffer[_channel_idx].size(), partition_count};
 
 	uint16_t partition_size = _buffer[_channel_idx].size() / partition_count;
 
