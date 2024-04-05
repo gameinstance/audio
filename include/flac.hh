@@ -68,6 +68,10 @@ enum class decoder_state {
 static const size_t max_channel_count = 2;
 
 
+template<typename INPUT_STREAM>
+streaminfo_type decode_metadata(INPUT_STREAM &istream);
+
+
 template<typename INPUT_STREAM, size_t BUFFER_SIZE = 8192>
 class decoder {
 public:
@@ -126,6 +130,51 @@ static constexpr int16_t _fixed_prediction_coefficients[5][4] = {
 	{3, -3, 1},
 	{4, -6, 4, -1},
 };
+
+
+template<typename INPUT_STREAM>
+streaminfo_type decode_metadata(INPUT_STREAM &istream)
+{
+	stream::bit::input<INPUT_STREAM> bit_istream{istream};
+
+	if (bit_istream.get_uint(32) != 0x664c6143)
+		throw basics::error{"%s: (protocol error) unexpected marker", _decoder_name};
+
+	auto res = streaminfo_type{};
+	bool is_last{false};
+	for (;;) {
+		// METADATA_BLOCK_HEADER <32>
+		if (bit_istream.get_uint(1) == 1)
+			is_last = true;
+
+		const auto metadata_type_id = bit_istream.get_uint(7);
+		auto metadata_byte_size = bit_istream.get_uint(24);
+
+		// METADATA_BLOCK_DATA
+		if (metadata_type_id == 0) {  // STREAMINFO
+
+			res.min_block_size  = bit_istream.get_uint(16);
+			res.max_block_size  = bit_istream.get_uint(16);
+			res.min_frame_size  = bit_istream.get_uint(24);
+			res.max_frame_size  = bit_istream.get_uint(24);
+			res.sample_rate     = bit_istream.get_uint(20);
+			res.channel_count   = bit_istream.get_uint(3) + 1;
+			res.sample_bit_size = bit_istream.get_uint(5) + 1;
+			res.sample_count    = bit_istream.get_uint(36);
+
+			// other bytes ignored
+			return res;
+		} else {  // OTHER METADATA BLOCKS
+			for (; metadata_byte_size > 0; --metadata_byte_size)
+				bit_istream.get_byte();
+		}
+
+		if (is_last)
+			break;
+	}
+
+	return res;
+}
 
 
 template<typename INPUT_STREAM, size_t BUFFER_SIZE>
